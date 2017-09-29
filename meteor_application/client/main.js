@@ -1,6 +1,5 @@
 import { Template } from 'meteor/templating';
 
-
 import './main.html';
 
 twitterData = new Mongo.Collection('oneYearData');
