@@ -1,0 +1,71 @@
+
+.title{
+    background-color: white;
+    height: 50px;
+    padding-left: 20px;
+    text-align: center;
+
+}
+
+.nextButton {
+    padding-left: 20px;
+}
+
+.instructions {
+    position: relative;
+    padding: 10px 10px 10px 30px;
+}
+
+.temp {
+    position: relative;
+    background-color: whitesmoke;
+    border: double black;
+    padding-left: 30px;
+    padding-right: 10px;
+}
+
+.qa {
+    padding-left: 20px;
+}
+
+
+
+.loader {
+    display: block;
+    margin: auto;
+}
+
+.loading-wrapper {
+    display: none;
+}
+
+
+.box{
+    box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)
+}
+.margin{
+    margin:16px!important
+}
+.white{
+    color:#000!important;
+    background-color:#fff!important;
+    padding-bottom: 20px
+}
+
+.bg-light-grey{
+    color:#000!important;
+    background-color:#f1f1f1!important}
+
+
+.container:after,.w3-container:before{
+    content:"";
+    display:table;
+    clear:both
+}
+.center{
+    text-align:center!important
+}
+.padding{
+    padding-top:5px!important;
+    padding-bottom:5px!important
+}
