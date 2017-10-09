@@ -5,7 +5,7 @@ import os
 
 
 TEXT_FILE_NAME = "twitter_data.json"
-ID_FILE_NAME = ""
+ID_FILE_NAME = "combinedAnnotation.json"
 TEMP_ID_COLLECTION = "tempIDCollection"
 TEMP_TEXT_COLLECTION = "tempTextCollection"
 
