@@ -4,16 +4,26 @@ import './main.html';
 
 twitterData = new Mongo.Collection('oneYearData');
 labels = new Mongo.Collection('label');
+workers = new Mongo.Collection('worker');
+hits = new Mongo.Collection('hit');
+
+
+q3Options = ['GettingHired', 'GettingFired', 'QuitingJob', 'LosingJob', 'GettingPromotion', 'CutInHours', 'Other'];
+tweetIDList = [];
+
+workerID = "";
+hitID = "";
+assignmentID ="";
 
 if(Meteor.isClient){
     var count = 0;
-    var answerOne = false;
-    var answerTwo = false;
-    var answerThree = false;
     var isComplete = false;
 
-    console.log("Client");
+    //console.log("Client");
     Session.set('selectedTweet', -1);
+    Session.set('q1', false);
+    Session.set('q2', false);
+    Session.set('q3', false);
 
     Template.content.onCreated( function() {
         this.subscribe( 'one_year_filtered', function() {
@@ -30,6 +40,40 @@ if(Meteor.isClient){
 
 
     Template.content.helpers( {
+
+
+        'validated': function () {
+            function turkGetParam( name ) {
+                var regexS = "[\?&]"+name+"=([^&#]*)";
+                var regex = new RegExp( regexS );
+                var tmpURL = fullurl;
+                var results = regex.exec( tmpURL );
+                if( results === null ) {
+                    return "";
+                } else {
+                    return results[1];
+                }
+            }
+
+
+            // Capture the URL
+            var fullurl = window.location.href;
+
+            assignmentID = turkGetParam('assignmentId');
+            hitID = turkGetParam('hitId');
+            workerID = turkGetParam('workerId');
+            console.log(assignmentID);
+            console.log(hitID);
+            console.log(workerID);
+            workers.insert({
+                workerID: workerID,
+                assignmentID: assignmentID,
+                hitID: hitID
+            });
+            return !(workerID === "" || assignmentID === "");
+
+        },
+
         'document': function () {
 
             if(Session.get('selectedTweet') === -1) {
@@ -43,12 +87,19 @@ if(Meteor.isClient){
         },
 
         'backButton': function () {
-            return Session.get('selectedTweet') > 0;
+            return Session.get('q1') && Session.get('q2') && Session.get('q3');
         },
 
         'completed': function () {
             if(Session.get('selectedTweet') === 3) {
                 isComplete = true;
+                hits.insert( {
+                    hitID: hitID,
+                    assignmentID: assignmentID,
+                    workerID: workerID,
+                    tweetList: tweetIDList
+                })
+
             }
             return isComplete;
         }
@@ -57,12 +108,61 @@ if(Meteor.isClient){
 
     Template.content.events( {
         'click .next': function (event, template) {
+            var element1 = template.find('input:radio[name=q1]:checked');
+            var element2 = template.find('input:radio[name=q2]:checked');
+            var element3 = template.findAll('input:checkbox[name=q3]:checked');
+            console.log("Selected options: " + $(element1).val() + " and " + $(element2).val() +
+                " and " + $(element3).val());
+            Session.set('selectedTweet',  count);
+            Session.set('q1', false);
+            Session.set('q2', false);
+            Session.set('q3', false);
+
+
+            var selectedBoxes = _.map(element3, function(item) {
+                return item.defaultValue;
+            });
+            //console.log(selectedBoxes.length);
+
+            function isChecked(selectedBoxes, q3Options, index) {
+                for(var i=0; i<selectedBoxes.length; i++) {
+                    if(selectedBoxes[i] === q3Options[index]) {
+                        return 1;
+                    }
+                }
+                return -1;
+            }
+
+            var checkboxResult = [];
+
+            for(var idx=0; idx<q3Options.length; idx++) {
+                var result = isChecked(selectedBoxes, q3Options, idx);
+                checkboxResult.push({'option':q3Options[idx], 'checked': result});
+            }
+
+
+            console.log(checkboxResult);
+
+            var indx = Session.get('selectedTweet');
+
+            var data = twitterData.find().fetch()[indx];
+            var tweetID = data['id'];
+            var tweetText = data['text'];
+            //console.log(data);
+            tweetIDList.push(tweetID);
+
+            labels.insert({
+                    id: tweetID,
+                    question1: $(element1).val(),
+                    question2: $(element2).val(),
+                    question3: checkboxResult
+                }
+            );
+
             count += 1;
             Session.set('selectedTweet',  count);
-            console.log(Session.get('selectedTweet'));
-            var element = template.find('input:radio[name=myBut]:checked');
+
             template.find("form").reset();
-            console.log($(element).val());
         },
 
         'click .back': function (event, template) {
@@ -77,57 +177,28 @@ if(Meteor.isClient){
 
         'change .qa': function (event, template) {
 
-            //console.log(event);
             var element1 = template.find('input:radio[name=q1]:checked');
             var element2 = template.find('input:radio[name=q2]:checked');
-            var element3 = template.find('input:radio[name=q3]:checked');
-            console.log("Selected options: " + $(element1).val() + " and " + $(element2).val() +
-                " and " + $(element3).val());
+            var element3 = template.find('input:checkbox[name=q3]:checked');
+            /*console.log("Selected options: " + $(element1).val() + " and " + $(element2).val() +
+                " and " + $(element3).val()); */
 
             if($(element1).val() !== undefined) {
-                answerOne = true;
+                Session.set('q1',  true);
             }
 
             if($(element2).val() !== undefined) {
-                answerTwo = true;
+                Session.set('q2',  true);
             }
 
             if($(element3).val() !== undefined) {
-                answerThree = true;
+                Session.set('q3',  true);
             }
 
-            if(answerOne && answerTwo && answerThree) {
-                var index = Session.get('selectedTweet');
-                count += 1;
-                var element1 = template.find('input:radio[name=q1]:checked');
-                var element2 = template.find('input:radio[name=q2]:checked');
-                var element3 = template.find('input:radio[name=q3]:checked');
-                console.log("Selected options: " + $(element1).val() + " and " + $(element2).val() +
-                    " and " + $(element3).val());
-
-                var data = twitterData.find().fetch()[index];
-                var tweetID = data['id'];
-                var tweetText = data['text'];
-                console.log(data);
-                console.log(tweetID);
-                console.log(tweetText);
-
-                labels.insert({
-                        id: tweetID,
-                        label1: $(element1).val(),
-                        label2: $(element2).val(),
-                        label3: $(element3).val()
-                    }
-                );
-
-
-                answerOne = false;
-                answerTwo = false;
-                answerThree = false;
-                template.find("form").reset();
+            if($(element3).val() === undefined) {
+                Session.set('q3', false);
             }
-            Session.set('selectedTweet',  count);
-        },
+        }
 
 
     });

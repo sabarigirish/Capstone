@@ -12,29 +12,33 @@
 
 <template name="content">
 
-  {{#if completed}}
-  <h4> Thank you for the contribution!</h4>
-  {{else}}
-  {{> loader}}
-  <div class="box margin white">
-    {{#if Template.subscriptionsReady}}
-    {{>instruction}}
-    <hr/>
-    <ul>
-      <li class="t"> <b>{{document.text}}</b></li>
-    </ul>
-    {{>QandA}}
-    <br/>
-    {{#if backButton}}
-    <div class="nextButton">
-      <button class="back">Back</button>
-      <button class="next">Next</button>
-    </div>
-    {{/if}}
-    {{/if}}
-  </div>
-  {{/if}}
+    {{#if validated}}
 
+        {{#if completed}}
+            <h4> Thank you for the contribution!</h4>
+        {{else}}
+            {{> loader}}
+            <div class="box margin white">
+                {{#if Template.subscriptionsReady}}
+                    {{>instruction}}
+                    <hr/>
+                    <ul>
+                        <li class="t"> <b>{{document.text}}</b></li>
+                    </ul>
+                    {{>QandA}}
+                    <br/>
+                    {{#if backButton}}
+                        <div class="nextButton">
+                            <!--button class="back">Back</button-->
+                            <button class="next">Next</button>
+                        </div>
+                    {{/if}}
+                {{/if}}
+            </div>
+        {{/if}}
+    {{else}}
+        <h4> Please login using the Mechanical Turk</h4>
+    {{/if}}
 </template>
 
 
@@ -88,13 +92,13 @@
       <input type="radio" name="q2" id="na" value="NoneoftheAbove">None of the above<br/>
       <p>Q3. Does the subject specifically mention any job/employment transition
         event in the tweet?</p>
-      <input type="radio" name="q3" id="hiring" value="Hiring">Getting hired<br/>
-      <input type="radio" name="q3" id="firing" value="Firing"> Getting fired<br/>
-      <input type="radio" name="q3" id="quit" value="quiting"> Quiting a job<br/>
-      <input type="radio" name="q3" id="firing" value="Losing"> Losing job some other way<br/>
-      <input type="radio" name="q3" id="firing" value="Promotion"> Getting promoted/raised<br/>
-      <input type="radio" name="q3" id="firing" value="Cut"> Getting cut in hours<br/>
-      <input type="radio" name="q3" id="NS" value="Other">Other
+        <input type="checkbox" name="q3" id="hiring" value="GettingHired">Getting hired<br/>
+        <input type="checkbox" name="q3" id="firing" value="GettingFired"> Getting fired<br/>
+        <input type="checkbox" name="q3" id="quit" value="QuitingJob"> Quiting a job<br/>
+        <input type="checkbox" name="q3" id="firing" value="LosingJob"> Losing job some other way<br/>
+        <input type="checkbox" name="q3" id="firing" value="GettingPromotion"> Getting promoted/raised<br/>
+        <input type="checkbox" name="q3" id="firing" value="CutInHours"> Getting cut in hours<br/>
+        <input type="checkbox" name="q3" id="NS" value="Other">Other
     </form>
   </div>
 </template>

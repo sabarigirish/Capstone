@@ -4,6 +4,8 @@ Meteor.startup(() => {
     // MongoDB collection
     twitterData  = new Mongo.Collection('oneYearData');
     labels = new Mongo.Collection('label');
+    workers = new Mongo.Collection('worker');
+    hits = new Mongo.Collection('hit');
     if(Meteor.isServer) {
         console.log('Server is running.....');
 
