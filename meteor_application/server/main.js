@@ -6,11 +6,12 @@ Meteor.startup(() => {
     labels = new Mongo.Collection('label');
     workers = new Mongo.Collection('worker');
     hits = new Mongo.Collection('hit');
+    activeTweets = new Mongo.Collection('activeTweet');
     if(Meteor.isServer) {
         console.log('Server is running.....');
 
-        Meteor.publish('one_year_filtered', function(){
-            return twitterData.find({}, {limit:100});
+        Meteor.publish('data', function(){
+            return activeTweets.find({}, {sort: {fitnessFuncValue:1}});
             //return twitterData.find({}, {sort: {fitnessFuncValue:-1}, limit:5});
         });
 

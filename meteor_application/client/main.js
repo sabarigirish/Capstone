@@ -6,6 +6,7 @@ twitterData = new Mongo.Collection('oneYearData');
 labels = new Mongo.Collection('label');
 workers = new Mongo.Collection('worker');
 hits = new Mongo.Collection('hit');
+activeTweets = new Mongo.Collection('activeTweet');
 
 
 q3Options = ['GettingHired', 'GettingFired', 'QuitingJob', 'LosingJob', 'GettingPromotion', 'CutInHours', 'Other'];
@@ -26,7 +27,7 @@ if(Meteor.isClient){
     Session.set('q3', false);
 
     Template.content.onCreated( function() {
-        this.subscribe( 'one_year_filtered', function() {
+        this.subscribe( 'data', function() {
             $( ".loader" ).delay( 1 ).fadeOut( 'slow', function() {
                 $( ".loading-wrapper" ).fadeIn( 'slow' );
             });
@@ -76,11 +77,13 @@ if(Meteor.isClient){
 
         'document': function () {
 
+            var data = activeTweets.find({'hitID': hitID}).fetch();
+            var tweetList = data[0]['tweets'];
             if(Session.get('selectedTweet') === -1) {
-                return twitterData.find().fetch()[count];
+                return tweetList[count];
             }
             else {
-                return twitterData.find().fetch()[Session.get('selectedTweet')];
+                return tweetList[Session.get('selectedTweet')];
 
             }
 
@@ -153,6 +156,9 @@ if(Meteor.isClient){
 
             labels.insert({
                     id: tweetID,
+                    workerID: workerID,
+                    assignmentID: assignmentID,
+                    hitID: hitID,
                     question1: $(element1).val(),
                     question2: $(element2).val(),
                     question3: checkboxResult

@@ -1,5 +1,5 @@
 from random import random
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 import json
 import os
 
@@ -20,25 +20,28 @@ def get_data_path():
 def insert_data(collection_name, id_collection):
     mongo_client = MongoClient('localhost', 3001)
     db = mongo_client.meteor
-    new_collection = db[id_collection]
+    twitter_id_collection = db[id_collection]
     temp_collection = db[TEMP_ID_COLLECTION]
     id_file_path = get_data_path() + "/" + ID_FILE_NAME
     with open(id_file_path) as input_file:
         for line in input_file:
             document = json.loads(line)
             if document['topic_human'] == 'job' or document['topic_machine'] == 'job':
-                new_collection.insert_one(document)
+                twitter_id_collection.insert_one(document)
                 temp_collection.insert_one(document)
 
-    new_collection = db[collection_name]
+    twitter_text_collection = db[collection_name]
     temp_collection = db[collection_name]
     data_file_path = get_data_path() + "/" + TEXT_FILE_NAME
     with open(data_file_path) as input_file:
         for line in input_file:
             document = json.loads(line)
             document['fitnessFuncValue'] = random()
-            new_collection.insert_one(document)
+            twitter_text_collection.insert_one(document)
             temp_collection.insert_one(document)
+
+    twitter_id_collection.create_index([('tweet_id', ASCENDING)], unique=True)
+    twitter_text_collection.create_index([('id', ASCENDING)], unique=True)
 
 
 def extract_job_realted_tweets(text_collection, id_collection, final_collection):
@@ -62,8 +65,9 @@ def extract_job_realted_tweets(text_collection, id_collection, final_collection)
         try:
             text = data['text']
             final_coll.insert_one({
-            'id': idx,
-            'text': text
+                'id': idx,
+                'text': text,
+                'fitnessFuncValue': random()
             })
         except TypeError:
             missing_tweet.append(idx)
