@@ -7,6 +7,7 @@ labels = new Mongo.Collection('label');
 workers = new Mongo.Collection('worker');
 hits = new Mongo.Collection('hit');
 activeTweets = new Mongo.Collection('activeTweet');
+tweetList = [];
 
 
 q3Options = ['GettingHired', 'GettingFired', 'QuitingJob', 'LosingJob', 'GettingPromotion', 'CutInHours', 'Other'];
@@ -78,7 +79,7 @@ if(Meteor.isClient){
         'document': function () {
 
             var data = activeTweets.find({'hitID': hitID}).fetch();
-            var tweetList = data[0]['tweets'];
+            tweetList = data[0]['tweets'];
             if(Session.get('selectedTweet') === -1) {
                 return tweetList[count];
             }
@@ -148,9 +149,9 @@ if(Meteor.isClient){
 
             var indx = Session.get('selectedTweet');
 
-            var data = twitterData.find().fetch()[indx];
+            var data = tweetList[indx];
             var tweetID = data['id'];
-            var tweetText = data['text'];
+            // var tweetText = tweetList['text'];
             //console.log(data);
             tweetIDList.push(tweetID);
 
